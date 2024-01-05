@@ -43,8 +43,13 @@
 4. serve/hooks
 5. serve/parser-html
 
-脚本运行：node serve/main-test.js
+打包：
+1. npm i
+2. npm run electron
+3. npm run build
+测试脚本运行：node serve/main-test.js
 ![文件描述](./docs/assets/7.jpg)
+
 
 ### 预览
 ![预览1](./docs/assets/1.png)
