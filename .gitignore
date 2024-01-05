@@ -1,0 +1,8 @@
+node_modules
+serve/download
+serve/log
+serve/storage
+.DS_Store
+dist
+dist-ssr
+*.local

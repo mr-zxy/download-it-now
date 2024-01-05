@@ -1,0 +1,19 @@
+appId: download-it-now
+copyright: Copyright © 2023-present xuyang
+directories:
+  buildResources: assets
+  output: dist_download-it-now
+nsis:
+  perMachine: true
+  oneClick: false
+  allowElevation: true
+  allowToChangeInstallationDirectory: true
+win:
+  icon: electron/assets/icon.png
+  target: nsis
+extraResources:
+  - from: build-shell/section-download.js
+    to: app.asar.unpacked/core/section-download.js
+files:
+  - electron/
+  - serve/
