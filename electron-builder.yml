@@ -8,9 +8,15 @@ nsis:
   oneClick: false
   allowElevation: true
   allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  runAfterFinish: true
 win:
   icon: electron/assets/icon.png
-  target: nsis
+  target:
+    - target: nsis
+      arch:
+        - x64
 extraResources:
   - from: build-shell/section-download.js
     to: app.asar.unpacked/core/section-download.js

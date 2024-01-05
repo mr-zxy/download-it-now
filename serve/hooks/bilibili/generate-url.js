@@ -23,7 +23,6 @@ function getContentRange(page) {
 
 module.exports = async (url) => {
     const { page } = bilibiliLogin.bilibiliConfig.browser;
-    await page.goto(url, { waitUntil: 'networkidle0' });
     const __playinfo__ = await page.evaluate(() => {
         return window.__playinfo__
     });

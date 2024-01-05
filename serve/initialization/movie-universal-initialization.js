@@ -40,6 +40,7 @@ class MovieUniversalInitialization {
         const { videoUrl, audioUrl } = url;
         console.log("开始获取资源！");
         if (audioUrl) {
+            console.log("音频Url：" + audioUrl);
             const fileInfo = await got.head(audioUrl, { headers, agent: agent.getGotAgent() });
             const totalBytes = fileInfo.headers['content-length'];
             console.log("音频Byte：" + totalBytes);
@@ -48,9 +49,10 @@ class MovieUniversalInitialization {
         }
 
         if (videoUrl) {
+            console.log("视频Url：" + videoUrl);
             const fileInfo = await got.head(videoUrl, { headers, agent: agent.getGotAgent() });
             const totalBytes = fileInfo.headers['content-length'];
-            console.log("视频Byte：" + totalBytes);
+            console.log("视频Byte：" + totalBytes)
             const list = this.generateDownloadList(videoUrl, totalBytes, 80, "video", this.ranges.length)
             this.ranges = this.ranges.concat(list);
         }

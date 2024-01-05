@@ -2,7 +2,7 @@ const bilibiliLogin = require("./movies-login")
 
 module.exports = async (url = "", website = "") => {
     const { page } = bilibiliLogin.bilibiliConfig.browser;
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(url, { waitUntil: 'networkidle2' });
     const __INITIAL_STATE__ = await page.evaluate(() => {
         return window.__INITIAL_STATE__
     });

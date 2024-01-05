@@ -8,7 +8,7 @@ const bilibiliLogin = require("./movies-login")
  */
 module.exports = async (url = "", _website = "") => {
     const { page } = bilibiliLogin.bilibiliConfig.browser;
-    await page.goto(url, { waitUntil: 'networkidle0' });
+    await page.goto(url, { waitUntil: 'networkidle2' });
     const __pinia = await page.evaluate(() => {
         return window.__pinia
     });
