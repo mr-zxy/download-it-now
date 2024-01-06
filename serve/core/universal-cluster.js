@@ -9,10 +9,12 @@ const RequestTimeout = {
     0: 10000,
     1: 20000,
     2: 30000,
+    3: 40000,
+    4: 50000,
 }
 
 // 失败了 几次之后暂停
-const suspendErrorNumber = 3;
+const suspendErrorNumber = 5;
 
 const Status = {
     NotStarted: "not_started", // 未开始
@@ -117,7 +119,7 @@ class Cluster {
                 const workIndex = this.workers.findIndex(v => v?.id === uuid);
                 this.workers.splice(workIndex, 1)[0]?.kill("SIGTERM");
 
-                if (this.workers.length === 0) {
+                if (this.workers.length === 0 && this.statusCode === 10014) {
                     this.statusCode = 10015;
                     this.progres = 100;
                     if (this.callback) {

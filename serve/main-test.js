@@ -23,7 +23,7 @@ const param = {
         audioFormat: "m3u8", // 视频格式
         name: "1",  // 名称
         episodes: "2", // 集数
-        url: { label: "1", audioUrl: "", videoUrl: "https://media-oss.plasticmemory.net/m3u8/1701512625871.m3u8" }, // 视频地址
+        url: { label: "1", audioUrl: "", videoUrl: "https://v91.whweitao.com/202311/10/1EUqZ7d0gk2/video/8000k_0X2160_64k_25/hls/index.m3u8" }, // 视频地址
         headers: {} // 请求头
     }
 }
