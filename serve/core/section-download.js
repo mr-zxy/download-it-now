@@ -25,11 +25,13 @@ async function downloadRange(data, param) {
 
             const headers = param.videoInfo.headers || {};
             headers.range = `bytes=${startByte}-${endByte}`
-
             const stream = got.stream(url, {
                 headers: headers,
-                agent: agent.getGotAgent()
-            }).on('request', request => timer = setTimeout(() => request.destroy(), timeout))
+                agent: agent.getGotAgent(),
+                timeout
+            }).on("error", (err) => {
+                reject(err);
+            });
 
             const outputPath = path.join(downloadPath, param.title, param.videoInfo.name, param.videoInfo.episodes, name)
             const outputStream = fs.createWriteStream(outputPath);
@@ -81,19 +83,17 @@ async function m3u8RunDownload(data) {
     const name = index + "_" + (urlSplit[urlSplit.length - 1].replace(/\?|\&/g, ""));
     downloadExistsCreateFolder(downloadPath, param);
 
-    let timer = null;
     const outputPath = path.join(downloadPath, param.title, param.videoInfo.name, param.videoInfo.episodes, name);
 
     try {
         await pipeline(
-            got.stream(url, { headers: param.videoInfo.headers || {}, agent: agent.getGotAgent() }).on('request', request => timer = setTimeout(() => request.destroy(), timeout)),
+            got.stream(url, { headers: param.videoInfo.headers || {}, agent: agent.getGotAgent(), timeout }),
             fs.createWriteStream(outputPath)
         );
         process.send({ type: "success", index: index, uuid });
     } catch (e) {
         process.send({ type: "error", index: index, uuid });
     } finally {
-        clearTimeout(timer);
         process.send({ type: "exit", index: index, uuid });
     }
 }

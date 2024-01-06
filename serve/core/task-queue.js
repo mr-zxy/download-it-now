@@ -30,8 +30,8 @@ class TaskQueue {
 
         process.on('exit', (_code) => {
             clearTimeout(timer);
-            app.quit();
-            app.exit();
+            app?.quit();
+            app?.exit();
             process.exit();
         });
     }

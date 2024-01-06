@@ -1,5 +1,4 @@
 const childFork = require('child_process').fork;
-const fs = require('fs');
 const path = require('path');
 const numCPUs = require('os').cpus().length;
 const uuid = require("uuid");
@@ -10,9 +9,10 @@ const RequestTimeout = {
     0: 10000,
     1: 20000,
     2: 30000,
-    3: 40000,
-    4: 50000
 }
+
+// 失败了 几次之后暂停
+const suspendErrorNumber = 3;
 
 const Status = {
     NotStarted: "not_started", // 未开始
@@ -22,20 +22,28 @@ const Status = {
 
 const downloadPath = getDownPath()
 
-// 失败了 几次之后暂停
-const suspendErrorNumber = 5;
-
 class Cluster {
     constructor(rangeList = [], param = {}, callback = null) {
-        // 暂停开关
-        this.suspendSwitch = false;
+        this.suspendSwitch = false;  // 暂停开关
         this.param = param;
-        this.rangeList = rangeList;
+        this.rangeList = this.rangesInit(rangeList);
         this.progres = 0;
         this.statusCode = 10013;
         this.callback = callback;
         this.workers = []; // 子进程
         this.proxyStatus();
+    }
+
+    rangesInit(ranges) {
+        // downList.length = 1;
+        ranges.forEach((v, index) => {
+            v.index = index;
+            v.timeout = RequestTimeout[0];
+            v.status = Status.NotStarted;
+            v.errorNumber = 0;
+            v.size = 0;
+        });
+        return ranges;
     }
 
     /**
@@ -83,13 +91,12 @@ class Cluster {
                 if (second) {
                     downList[index].timeout = second
                 };
-
-                if (downList[index].errorNumber > suspendErrorNumber) {
-                    this.suspendSwitch = true;
+                // console.log("失败次数", downList[index].errorNumber, suspendErrorNumber)
+                if (downList[index].errorNumber >= suspendErrorNumber) {
+                    this.suspendCluster();
                     this.statusCode = 10012;
                 }
 
-                // console.log("失败次数：" + downList[index].errorNumber)
                 downList[index].errorNumber += 1;
                 downList[index].status = Status.NotStarted;
             }
@@ -195,6 +202,7 @@ class Cluster {
             {
                 type: "m3u8_download",
                 uuid: worker.id,
+                name: data.name,
                 url: data.uri,
                 index: data.index,
                 timeout: data.timeout,
@@ -209,23 +217,9 @@ class Cluster {
      * @param {*} completedNumber 已经下载完成的数量，继续下载 传入。
      * @returns 
      */
-    startCluster(completedNumber = 0) {
-        const downList = this.rangeList;
-        // downList.length = 10;
+    startCluster() {
         this.statusCode = 10014;
         this.suspendSwitch = false;
-
-        downList.forEach((v, index) => {
-            v.index = index;
-            v.timeout = RequestTimeout[0];
-            v.status = Status.NotStarted;
-            v.errorNumber = 0;
-        });
-
-        for (let i = 0; i < completedNumber; i++) {
-            downList[i].status = Status.Completed;
-        };
-
         for (let i = 0; i < numCPUs; i++) {
             this.fork()
         }
@@ -233,11 +227,16 @@ class Cluster {
 
     // 下载暂停
     suspendCluster() {
-
+        // 清除全部子任务
         this.workers.forEach((worker) => {
             worker.kill('SIGTERM');
         })
         this.workers = [];
+
+        // 把进行中切换成未开始
+        this.rangeList.forEach((v) => {
+            if (v.status === Status.InProgress) v.status = Status.NotStarted;
+        });
 
         this.suspendSwitch = true;
         this.statusCode = 10011;
@@ -246,24 +245,7 @@ class Cluster {
 
     // 继续下载
     async reDownloadCluster() {
-        const param = this.param;
-        const filPath = `${downloadPath}/${param.title}/${param.videoInfo.name}/${param.videoInfo.episodes}`;
-        const files = fs.readdirSync(filPath).filter(v => /^\d/.test(v)).sort((a, b) => {
-            const aNumber = a.split("_")[0] * 1;
-            const bNumber = b.split("_")[0] * 1;
-            return aNumber - bNumber
-        });
-
-        const result = files.find(v => fs.statSync(filPath + "/" + v).size === 0);
-
-        let number = 0;
-        if (result) {
-            const [index, _] = path.basename(result).split("_");
-            number = index - 1;
-        } else {
-            number = files.length - numCPUs
-        }
-        this.startCluster(number);
+        this.startCluster();
     }
 };
 
