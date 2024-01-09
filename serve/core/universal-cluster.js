@@ -105,6 +105,7 @@ class Cluster {
 
             if (type === "success") {
                 downList[index].status = Status.Completed
+                this.finish()
             }
 
             if (type === "exit") {
@@ -119,19 +120,30 @@ class Cluster {
                 const workIndex = this.workers.findIndex(v => v?.id === uuid);
                 this.workers.splice(workIndex, 1)[0]?.kill("SIGTERM");
 
-                if (this.workers.length === 0 && this.statusCode === 10014) {
-                    this.statusCode = 10015;
-                    this.progres = 100;
-                    if (this.callback) {
-                        this.callback();
-                        this.callback = null;
-                    }
+                if (this.finish()) {
                     return
                 }
 
                 this.fork()
             }
         });
+    }
+
+    finish() {
+        if (this.rangeList.every(v => v.status === Status.Completed) && this.statusCode === 10014) {
+            this.workers.forEach((worker) => {
+                worker.kill('SIGTERM');
+            })
+            this.workers = [];
+            this.statusCode = 10015;
+            this.progres = 100;
+            if (this.callback) {
+                this.callback();
+                this.callback = null;
+            }
+            return true
+        }
+        return false
     }
 
     /**
