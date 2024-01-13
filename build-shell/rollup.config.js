@@ -4,7 +4,6 @@ const resolve = require("@rollup/plugin-node-resolve");
 const json = require('@rollup/plugin-json')
 const obfuscate = require('rollup-plugin-obfuscator');
 
-console.log(obfuscate)
 module.exports = {
     input: path.resolve(__dirname, '../serve/core/section-download.js'), // 入口文件
     output: {

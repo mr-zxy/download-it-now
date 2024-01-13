@@ -119,7 +119,7 @@ module.exports = [
         logo: "https://www.freeok.vip/mxtheme/images/favicon.png",
         analysis: {
             websiteDefaultDataUrl: "https://www.freeok.vip/", // 主页面路径
-            websiteSearchUrl: "https://www.freeok.vip/so1so/-------------.html?wd=", // 搜索路径
+            websiteSearchUrl: "https://www.freeok.pro/so1so/-------------.html?wd=", // 搜索路径
             websiteSearchPath: "parser-html/freeok/movies-search", // 搜索 方法
             getDefaultPath: "parser-html/freeok/movies-default",   // 主页面，初始化，方法。
             getMovieDetailPath: "parser-html/freeok/movies-detail", // 详情搜索方法
